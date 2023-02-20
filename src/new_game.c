@@ -45,15 +45,22 @@
 #include "mystery_gift.h"
 #include "union_room_chat.h"
 #include "constants/items.h"
+#include "daycare.h"
+// #include "constants/species.h"
+// #include "constants/pokemon.h"
+// #include "constants/moves.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
 
 static void ClearFrontierRecord(void);
 static void WarpToTruck(void);
 static void ResetMiniGamesRecords(void);
+static void GiveRandomEggs(void);
+static u16 GenerateRandomSpecies(void);
 
 EWRAM_DATA bool8 gDifferentSaveFile = FALSE;
 EWRAM_DATA bool8 gEnableContestDebugging = FALSE;
+extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
 static const struct ContestWinner sContestWinnerPicDummy =
 {
@@ -204,6 +211,71 @@ void NewGameInitData(void)
     WipeTrainerNameRecords();
     ResetTrainerHillResults();
     ResetContestLinkResults();
+    GiveRandomEggs();
+}
+
+static void GiveRandomEggs(void)
+{
+    int boxId = 0;
+    int boxPosition = 0;
+    int i;
+
+    for (i = 0; i < 100; i++) {
+        struct Pokemon mon;
+        u8 isEgg;
+        u16 species;
+        u32 eggCycle = 0;
+        species = GenerateRandomSpecies();
+
+        CreateEgg(&mon, species, FALSE);
+        isEgg = TRUE;
+        SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
+        SetMonData(&mon, MON_DATA_FRIENDSHIP, &eggCycle);
+
+        SendMonToPC(&mon);
+
+        boxPosition++;
+
+        if (boxPosition >= 30) {
+            boxPosition = 0;
+            boxId++;
+        }
+    }
+
+    AddBagItem(ITEM_RARE_CANDY, 999);
+}
+
+static u16 GenerateRandomSpecies(void)
+{
+    u16 species;
+    bool8 isInvalidMon;
+    int j;
+    int k;
+    isInvalidMon = TRUE;
+    
+    while (isInvalidMon)
+    {
+        isInvalidMon = FALSE;
+        species = Random() & FORMS_START;
+
+        for (j = 1; j < NUM_SPECIES; j++)
+        {
+            for (k = 0; k < EVOS_PER_MON; k++)
+            {
+                if (gEvolutionTable[j][k].targetSpecies == species)
+                {
+                    isInvalidMon = TRUE;
+                }
+            }
+        }
+
+        if (gSpeciesInfo[species].flags & (SPECIES_FLAG_LEGENDARY | SPECIES_FLAG_MYTHICAL | SPECIES_FLAG_ULTRA_BEAST))
+        {
+            isInvalidMon = TRUE;
+        }
+    }
+
+    return species;
 }
 
 static void ResetMiniGamesRecords(void)
