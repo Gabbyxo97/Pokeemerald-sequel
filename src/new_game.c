@@ -241,8 +241,6 @@ static void GiveRandomEggs(void)
             boxId++;
         }
     }
-
-    AddBagItem(ITEM_RARE_CANDY, 999);
 }
 
 static u16 GenerateRandomSpecies(void)
