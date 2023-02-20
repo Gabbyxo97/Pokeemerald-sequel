@@ -687,7 +687,7 @@ static bool8 CheckPyramidBagHasItem(u16 itemId, u16 count)
 {
     u8 i;
     u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
+    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
 
     for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
     {
@@ -709,7 +709,7 @@ static bool8 CheckPyramidBagHasSpace(u16 itemId, u16 count)
 {
     u8 i;
     u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
+    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
 
     for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
     {
@@ -732,10 +732,10 @@ bool8 AddPyramidBagItem(u16 itemId, u16 count)
     u16 i;
 
     u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
+    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
 
     u16 *newItems = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newItems));
-    u8 *newQuantities = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
+    u16 *newQuantities = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
 
     memcpy(newItems, items, PYRAMID_BAG_ITEMS_COUNT * sizeof(*newItems));
     memcpy(newQuantities, quantities, PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
@@ -805,7 +805,7 @@ bool8 RemovePyramidBagItem(u16 itemId, u16 count)
     u16 i;
 
     u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
+    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
 
     i = gPyramidBagMenuState.cursorPosition + gPyramidBagMenuState.scrollPosition;
     if (items[i] == itemId && quantities[i] >= count)
