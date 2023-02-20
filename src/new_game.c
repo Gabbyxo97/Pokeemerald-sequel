@@ -271,7 +271,7 @@ static u16 GenerateRandomSpecies(void)
 
         if (gSpeciesInfo[species].flags & (SPECIES_FLAG_LEGENDARY | SPECIES_FLAG_MYTHICAL | SPECIES_FLAG_ULTRA_BEAST))
         {
-            isInvalidMon = TRUE;
+            isInvalidMon = Random() < (65536/5);
         }
     }
 
