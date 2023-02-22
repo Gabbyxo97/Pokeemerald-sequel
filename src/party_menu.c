@@ -164,13 +164,6 @@ enum {
 #define MENU_DIR_LEFT    -2
 
 enum {
-    CAN_LEARN_MOVE,
-    CANNOT_LEARN_MOVE,
-    ALREADY_KNOWS_MOVE,
-    CANNOT_LEARN_MOVE_IS_EGG
-};
-
-enum {
     // Window ids 0-5 are implicitly assigned to each party pokemon in InitPartyMenuBoxes
     WIN_MSG = PARTY_SIZE,
 };
@@ -273,7 +266,6 @@ static void DisplayPartyPokemonHPBarCheck(struct Pokemon *, struct PartyMenuBox 
 static void DisplayPartyPokemonDescriptionText(u8, struct PartyMenuBox *, u8);
 static bool8 IsMonAllowedInMinigame(u8);
 static void DisplayPartyPokemonDataToTeachMove(u8, u16);
-static u8 CanTeachMove(struct Pokemon *, u16);
 static void DisplayPartyPokemonBarDetail(u8, const u8 *, u8, const u8 *);
 static void DisplayPartyPokemonLevel(u8, struct PartyMenuBox *);
 static void DisplayPartyPokemonGender(u8, u16, u8 *, struct PartyMenuBox *);
@@ -2033,7 +2025,7 @@ static void Task_HandleCancelParticipationYesNoInput(u8 taskId)
     }
 }
 
-static u8 CanTeachMove(struct Pokemon *mon, u16 move)
+u8 CanTeachMove(struct Pokemon *mon, u16 move)
 {
     if (GetMonData(mon, MON_DATA_IS_EGG))
         return CANNOT_LEARN_MOVE_IS_EGG;
@@ -2605,17 +2597,35 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
     AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
 
     // Add field moves to action list
-    for (i = 0; i < MAX_MON_MOVES; i++)
-    {
+    // for (j = 0; sFieldMoves[j] != FIELD_MOVE_WATERFALL; j++)
+    // {
+    //     if (CanTeachMove(&mons[slotId], sFieldMoves[j]) == CAN_LEARN_MOVE) {
+    //         AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
+    //     }
+    // }
+
         for (j = 0; sFieldMoves[j] != FIELD_MOVES_COUNT; j++)
         {
-            if (GetMonData(&mons[slotId], i + MON_DATA_MOVE1) == sFieldMoves[j])
-            {
-                AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
-                break;
+            if (sFieldMoves[j] <= MOVE_WATERFALL && FlagGet(FLAG_BADGE01_GET + sFieldMoves[j]) != TRUE) {
+                continue;
+            }
+
+            if (sFieldMoves[j] == MOVE_FLASH) {
+                if (CanTeachMove(&mons[slotId], sFieldMoves[j]) == CAN_LEARN_MOVE && FlagGet(FLAG_BADGE02_GET) == TRUE) {
+                    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
+                    break;
+                }
+            } else {
+                for (i = 0; i < MAX_MON_MOVES; i++)
+                {
+                    if (GetMonData(&mons[slotId], i + MON_DATA_MOVE1) == sFieldMoves[j])
+                    {
+                        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
+                        break;
+                    }
+                }    
             }
         }
-    }
 
     if (!InBattlePike())
     {
